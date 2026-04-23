@@ -1,5 +1,6 @@
 package com.ticketapp.api.services;
 
+import com.ticketapp.api.dtos.TicketDto;
 import com.ticketapp.api.enums.TicketEnum;
 import com.ticketapp.api.enums.UserEnum;
 import com.ticketapp.api.models.TicketModel;
@@ -9,6 +10,8 @@ import com.ticketapp.api.repositories.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 @Service
 public class TicketService {
@@ -22,43 +25,42 @@ public class TicketService {
     }
 
     @Transactional
-    public TicketModel createTicket(TicketModel ticketModel){
+    public TicketModel createTicket(TicketDto ticketDto){
         TicketModel ticket = new TicketModel();
 
-        ticket.setTitle(ticketModel.getTitle());
-        ticket.setDescription(ticketModel.getDescription());
+        ticket.setTitle(ticketDto.getTitle());
+        ticket.setDescription(ticketDto.getDescription());
         ticket.setStatus(TicketEnum.TicketStatus.OPEN);
-        ticket.setClient(validateClient(ticketModel.getClient()));
+        ticket.setClient(validateClient(ticketDto.getClientId()));
 
-        if (ticketModel.getTechnician() != null) {
-            ticket.setTechnician(validateTechnician(ticketModel.getTechnician()));
+        if (ticketDto.getTechnicianId() != null) {
+            ticket.setTechnician(validateTechnician(ticketDto.getTechnicianId()));
         }
-        ticket.setDateOpen(ticketModel.getDateOpen());
 
         return ticketRepository.save(ticket);
     }
 
-    private UserModel validateClient(UserModel clientInput){
-        if (clientInput == null || clientInput.getId() == null){
+    private UserModel validateClient(UUID clientId){
+        if (clientId == null){
             throw new IllegalArgumentException("Client cannot be null.");
         }
 
-        UserModel client = userRepository.findById(clientInput.getId())
+        UserModel client = userRepository.findById(clientId)
                 .orElseThrow(() -> new EntityNotFoundException("Client does not exist."));
 
-        if (client.getType() == UserEnum.UserType.TECHNICIAN){
-            throw new IllegalArgumentException("Technician canot open tickets.");
+        if (client.getType() != UserEnum.UserType.CLIENT){
+            throw new IllegalArgumentException("Only clients can open tickets.");
         }
 
         return client;
     }
 
-    private UserModel validateTechnician(UserModel technicianInput){
-        if (technicianInput.getId() == null) {
+    private UserModel validateTechnician(UUID technicianId){
+        if (technicianId == null) {
             throw new IllegalArgumentException("Technician ID cannot be null.");
         }
 
-        UserModel technician = userRepository.findById(technicianInput.getId())
+        UserModel technician = userRepository.findById(technicianId)
                 .orElseThrow(() -> new EntityNotFoundException("Technician does not exist."));
 
         if (technician.getType() != UserEnum.UserType.TECHNICIAN) {
