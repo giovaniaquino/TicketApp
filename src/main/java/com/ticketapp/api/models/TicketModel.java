@@ -27,7 +27,7 @@ public class TicketModel {
     private String description;
 
     @CreatedDate
-    @Column(nullable = false)
+    @Column()
     private LocalDateTime dateOpen;
 
     @LastModifiedDate
@@ -35,11 +35,11 @@ public class TicketModel {
     private LocalDateTime dateClose;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column()
     private TicketEnum.TicketStatus status;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column()
     private TicketEnum.TicketPrio priority;
 
     @ManyToOne

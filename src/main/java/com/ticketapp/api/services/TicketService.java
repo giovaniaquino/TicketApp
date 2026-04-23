@@ -47,7 +47,8 @@ public class TicketService {
         responseDto.setStatus(String.valueOf(savedTicket.getStatus()));
         responseDto.setClientId(savedTicket.getClient().getId());
 
-        if (savedTicket.getTechnician().getId() != null) {
+        if (savedTicket.getTechnician() != null &&
+            savedTicket.getTechnician().getId() != null) {
             responseDto.setTechnicianId(savedTicket.getTechnician().getId());
         }
 
