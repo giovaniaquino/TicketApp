@@ -1,8 +1,9 @@
 package com.ticketapp.api.controllers;
 
 import com.ticketapp.api.dtos.TicketDto;
-import com.ticketapp.api.models.TicketModel;
+import com.ticketapp.api.dtos.TicketResponseDto;
 import com.ticketapp.api.services.TicketService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,7 +22,7 @@ public class TicketController {
     }
 
     @PostMapping
-    public ResponseEntity<TicketModel> createTicket(@RequestBody TicketDto ticketDto){
+    public ResponseEntity<TicketResponseDto> createTicket(@RequestBody @Valid TicketDto ticketDto){
         return ResponseEntity.status(HttpStatus.CREATED).body(ticketService.createTicket(ticketDto));
     }
 }

@@ -1,6 +1,7 @@
 package com.ticketapp.api.services;
 
 import com.ticketapp.api.dtos.TicketDto;
+import com.ticketapp.api.dtos.TicketResponseDto;
 import com.ticketapp.api.enums.TicketEnum;
 import com.ticketapp.api.enums.UserEnum;
 import com.ticketapp.api.models.TicketModel;
@@ -25,7 +26,7 @@ public class TicketService {
     }
 
     @Transactional
-    public TicketModel createTicket(TicketDto ticketDto){
+    public TicketResponseDto createTicket(TicketDto ticketDto){
         TicketModel ticket = new TicketModel();
 
         ticket.setTitle(ticketDto.getTitle());
@@ -37,7 +38,20 @@ public class TicketService {
             ticket.setTechnician(validateTechnician(ticketDto.getTechnicianId()));
         }
 
-        return ticketRepository.save(ticket);
+        TicketModel savedTicket = ticketRepository.save(ticket);
+
+        TicketResponseDto responseDto = new TicketResponseDto();
+        responseDto.setId(savedTicket.getId());
+        responseDto.setTitle(savedTicket.getTitle());
+        responseDto.setDescription(savedTicket.getDescription());
+        responseDto.setStatus(String.valueOf(savedTicket.getStatus()));
+        responseDto.setClientId(savedTicket.getClient().getId());
+
+        if (savedTicket.getTechnician().getId() != null) {
+            responseDto.setTechnicianId(savedTicket.getTechnician().getId());
+        }
+
+        return responseDto;
     }
 
     private UserModel validateClient(UUID clientId){
